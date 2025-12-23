@@ -1,8 +1,11 @@
+
 import React, { useState } from 'react';
-import { Flight, TravelClass, Passenger, ExtraService, Booking, User } from '../types';
+import { Flight, TravelClass, Passenger, Booking, User } from '../types';
 import { StorageService } from '../services/storage';
-import { EXTRAS, CLASS_MULTIPLIERS } from '../constants';
+import { EXTRAS, CLASS_MULTIPLIERS, CITIES } from '../constants';
 import { SeatPicker } from './SeatPicker';
+import { CustomSelect } from './CustomSelect';
+import { LuxuryButton } from './LuxuryButton';
 
 interface BookingFlowProps {
   user: User | null;
@@ -19,12 +22,15 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ user, onNavigate, onCo
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   
+  const [searchFrom, setSearchFrom] = useState('');
+  const [searchTo, setSearchTo] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+
   const totalPassengerCount = passengerCount.adults + passengerCount.children + passengerCount.infants;
 
   const handleFlightSelect = (flight: Flight) => {
     setSelectedFlight(flight);
     setStep(2);
-    // Initialize passengers array
     const newPass: Passenger[] = Array(totalPassengerCount).fill(null).map(() => ({
       fullName: '', passportNumber: '', nationality: '', dateOfBirth: '', email: '', phone: '', type: 'Adult'
     }));
@@ -43,7 +49,6 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ user, onNavigate, onCo
 
   const handleFinalBooking = () => {
     if (!selectedFlight || !user) return;
-    
     const booking: Booking = {
       id: 'BK-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
       userId: user.id,
@@ -56,372 +61,184 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ user, onNavigate, onCo
       bookingDate: new Date().toISOString(),
       class: travelClass
     };
-
     StorageService.saveBooking(booking);
-    setStep(5); // Confirmation
+    setStep(5);
   };
 
-  // Step 1: Flight Search & List
+  const allFlights = StorageService.getFlights();
+  const originOptions = CITIES.map(city => ({ value: city, label: city }));
+  const destinationOptions = CITIES.map(city => ({ value: city, label: city }));
+
   if (step === 1) {
-    const flights = StorageService.getFlights();
+    const filteredFlights = hasSearched 
+      ? allFlights.filter(f => 
+          (searchFrom ? f.departureCity.includes(searchFrom) : true) && 
+          (searchTo ? f.destinationCity.includes(searchTo) : true)
+        )
+      : [];
+
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        <header className="text-center">
-          <h2 className="text-5xl font-serif text-white mb-4">Discover Your <span className="text-gold-400">Destination</span></h2>
-          <p className="text-white/50 uppercase tracking-widest text-sm">Select a curated luxury route</p>
-        </header>
+      <div className="space-y-16 animate-in fade-in duration-1000">
+        <section className="relative h-[600px] rounded-[3rem] overflow-hidden group shadow-2xl border border-white/5">
+          <div className="absolute inset-0 bg-black">
+            <img 
+              src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2000&auto=format&fit=crop" 
+              alt="Elite Jet Interior" 
+              className="w-full h-full object-cover opacity-60 transition-transform duration-[10s] group-hover:scale-105"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-luxury-deep via-transparent to-transparent"></div>
+          <div className="absolute inset-0 flex flex-col justify-end p-16 md:p-24">
+            <span className="text-gold-400 font-bold uppercase tracking-[0.5em] text-[10px] mb-4">Sovereign Airspace</span>
+            <h2 className="text-6xl md:text-8xl font-serif text-white max-w-4xl mb-8 leading-tight animate-in slide-in-from-bottom-20 duration-1000 delay-200">
+              Ascend Into <br />
+              <span className="text-gold-400 italic gold-gradient">Pure Silence</span>
+            </h2>
+            <p className="text-white/50 text-xl font-light tracking-widest max-w-xl border-l-2 border-gold-400/40 pl-8">
+              Bespoke travel experiences curated for those who value time and privacy above all else.
+            </p>
+          </div>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {flights.map(f => (
-            <div key={f.id} className="glass-card p-6 rounded-lg border border-white/5 hover:border-gold-400/50 transition-all group flex flex-col h-full">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <p className="text-xs text-gold-400 font-bold tracking-widest uppercase">{f.flightNumber}</p>
-                  <p className="text-lg font-serif">{f.departureCity}</p>
-                  <p className="text-white/40 text-sm">to</p>
-                  <p className="text-lg font-serif">{f.destinationCity}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-white">${f.basePrice}</p>
-                  <p className="text-[10px] text-white/40 uppercase tracking-wider">Starting from</p>
-                </div>
-              </div>
+        <section className="glass-card p-12 rounded-[3rem] border border-white/10 -mt-32 relative z-30">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 items-end">
+            <CustomSelect 
+              label="Point of Departure"
+              value={searchFrom}
+              options={originOptions}
+              onChange={setSearchFrom}
+              placeholder="Origin Port"
+            />
+            <CustomSelect 
+              label="Final Destination"
+              value={searchTo}
+              options={destinationOptions}
+              onChange={setSearchTo}
+              placeholder="Arrival Port"
+            />
+            <CustomSelect 
+              label="Journey Class"
+              value={travelClass}
+              options={[
+                { value: TravelClass.ECONOMY, label: 'Standard Elite' },
+                { value: TravelClass.BUSINESS, label: 'Executive Suite' },
+                { value: TravelClass.FIRST, label: 'Sovereign First' },
+              ]}
+              onChange={(val) => setTravelClass(val as TravelClass)}
+            />
+            <LuxuryButton 
+              onClick={() => setHasSearched(true)}
+              className="w-full h-[62px]"
+            >
+              Check Availability
+            </LuxuryButton>
+          </div>
+        </section>
 
-              <div className="space-y-4 mb-8 text-sm">
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <span className="text-white/50">Date</span>
-                  <span>{f.departureDate}</span>
+        {hasSearched && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-bottom-10 duration-700">
+            {filteredFlights.map(f => (
+              <div key={f.id} className="glass-card p-10 rounded-[2.5rem] flex flex-col h-[480px] group transition-all duration-500 hover:border-gold-400/40 hover:-translate-y-4">
+                <div className="flex justify-between items-start mb-10">
+                  <span className="text-[10px] text-gold-400 font-bold tracking-[0.5em] uppercase">{f.flightNumber}</span>
+                  <div className="text-right">
+                    <p className="text-4xl font-serif text-white gold-gradient">${(f.basePrice * CLASS_MULTIPLIERS[travelClass]).toLocaleString()}</p>
+                    <p className="text-[8px] text-white/30 uppercase tracking-[0.4em] mt-2">Inclusive Charge</p>
+                  </div>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <span className="text-white/50">Duration</span>
-                  <span>{f.duration}</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <span className="text-white/50">Type</span>
-                  <span>{f.isDirect ? 'Direct' : 'Transit'}</span>
-                </div>
-              </div>
 
-              <div className="mt-auto pt-4 flex gap-2">
-                <select 
-                  className="bg-white/5 border border-white/20 p-2 rounded-sm text-xs uppercase text-gold-300"
-                  onChange={(e) => setTravelClass(e.target.value as TravelClass)}
-                >
-                  <option value={TravelClass.ECONOMY}>Economy</option>
-                  <option value={TravelClass.BUSINESS}>Business</option>
-                  <option value={TravelClass.FIRST}>First Class</option>
-                </select>
-                <button 
+                <div className="flex-grow space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-serif text-white">{f.departureCity.split('(')[0]}</p>
+                      <p className="text-[9px] text-white/30 uppercase tracking-widest mt-1">Departure</p>
+                    </div>
+                    <div className="w-12 h-px bg-gold-400/30"></div>
+                    <div className="text-right">
+                      <p className="text-2xl font-serif text-white">{f.destinationCity.split('(')[0]}</p>
+                      <p className="text-[9px] text-white/30 uppercase tracking-widest mt-1">Arrival</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
+                    <div>
+                      <p className="text-[8px] text-white/20 uppercase tracking-[0.2em] mb-1">Duration</p>
+                      <p className="text-xs text-white/80 font-medium">{f.duration}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[8px] text-white/20 uppercase tracking-[0.2em] mb-1">Date</p>
+                      <p className="text-xs text-white/80 font-medium">{f.departureDate}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <LuxuryButton 
                   onClick={() => handleFlightSelect(f)}
-                  className="flex-grow btn-gold text-black uppercase tracking-widest text-xs font-bold py-3 rounded-sm"
+                  className="w-full mt-10"
                 >
-                  Select Flight
-                </button>
+                  Confirm Reservation
+                </LuxuryButton>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
 
-  // Step 2: Seat Selection & Passenger Count
   if (step === 2) {
     return (
-      <div className="max-w-4xl mx-auto space-y-10">
+      <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in duration-700">
         <div className="flex items-center justify-between">
-          <button onClick={() => setStep(1)} className="text-white/50 hover:text-gold-400 transition-colors uppercase text-xs tracking-widest flex items-center">
-            ← Back to Results
+          <button onClick={() => setStep(1)} className="text-white/30 hover:text-gold-400 transition-colors uppercase text-[9px] font-bold tracking-[0.5em]">
+            ← Return to Hangar
           </button>
-          <div className="flex space-x-2">
-            {[1, 2, 3, 4].map(s => (
-              <div key={s} className={`w-2 h-2 rounded-full ${s === 2 ? 'bg-gold-400' : 'bg-white/20'}`} />
-            ))}
-          </div>
+          <h3 className="text-xl font-serif text-white italic">Seat <span className="text-gold-400 not-italic">Configuration</span></h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-8">
             <SeatPicker 
               selectedClass={travelClass} 
               passengerCount={totalPassengerCount}
               selectedSeats={selectedSeats}
-              onSeatToggle={(id) => {
-                setSelectedSeats(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-              }}
+              onSeatToggle={(id) => setSelectedSeats(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])}
             />
           </div>
-          <div className="space-y-6">
-            <div className="glass-card p-6 rounded-lg">
-              <h3 className="text-gold-400 uppercase tracking-widest text-sm mb-6 border-b border-white/10 pb-2">Travelers</h3>
-              <div className="space-y-4">
+          <div className="lg:col-span-4 space-y-8">
+            <div className="glass-card p-10 rounded-[2.5rem] border border-gold-400/20">
+              <h4 className="text-gold-400 uppercase tracking-[0.3em] text-[10px] font-bold mb-8 border-b border-white/5 pb-4">Manifest Info</h4>
+              <div className="space-y-8">
                 {['Adults', 'Children', 'Infants'].map(type => (
                   <div key={type} className="flex items-center justify-between">
-                    <span className="text-sm">{type}</span>
-                    <div className="flex items-center space-x-3">
+                    <span className="text-[11px] uppercase tracking-widest text-white/60">{type}</span>
+                    <div className="flex items-center space-x-6">
                       <button 
-                        // Fix: use 'passengerCount' instead of 'p' for keyof typeof to resolve the correct type for dynamic property access
                         onClick={() => setPassengerCount(p => ({...p, [type.toLowerCase()]: Math.max(type === 'Adults' ? 1 : 0, p[type.toLowerCase() as keyof typeof passengerCount] - 1)}))}
-                        className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all"
-                      > - </button>
-                      <span className="w-4 text-center">{passengerCount[type.toLowerCase() as keyof typeof passengerCount]}</span>
+                        className="w-8 h-8 rounded-full border border-white/10 hover:border-gold-400 transition-colors"
+                      > − </button>
+                      <span className="font-serif text-lg">{passengerCount[type.toLowerCase() as keyof typeof passengerCount]}</span>
                       <button 
-                        // Fix: use 'passengerCount' instead of 'p' for keyof typeof to resolve the correct type for dynamic property access
                         onClick={() => setPassengerCount(p => ({...p, [type.toLowerCase()]: p[type.toLowerCase() as keyof typeof passengerCount] + 1}))}
-                        className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all"
+                        className="w-8 h-8 rounded-full border border-white/10 hover:border-gold-400 transition-colors"
                       > + </button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            <button 
+            <LuxuryButton 
               disabled={selectedSeats.length !== totalPassengerCount}
               onClick={() => setStep(3)}
-              className="w-full py-4 btn-gold text-black font-bold uppercase tracking-widest text-sm rounded-sm disabled:opacity-30"
+              className="w-full"
             >
-              Continue to Details
-            </button>
+              Finalize Details
+            </LuxuryButton>
           </div>
         </div>
       </div>
     );
   }
 
-  // Step 3: Passenger Details & Extras
-  if (step === 3) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-12">
-        <button onClick={() => setStep(2)} className="text-white/50 hover:text-gold-400 transition-colors uppercase text-xs tracking-widest">
-          ← Back to Seats
-        </button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-8">
-            <h3 className="text-2xl font-serif text-white">Passenger <span className="text-gold-400">Information</span></h3>
-            {passengers.map((p, idx) => (
-              <div key={idx} className="glass-card p-6 rounded-lg space-y-4">
-                <h4 className="text-gold-400 text-xs uppercase tracking-widest font-bold">Passenger {idx + 1}</h4>
-                <div className="space-y-4">
-                  <input 
-                    placeholder="Full Name (as per Passport)"
-                    className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-sm"
-                    value={p.fullName}
-                    onChange={(e) => {
-                      const n = [...passengers];
-                      n[idx].fullName = e.target.value;
-                      setPassengers(n);
-                    }}
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input 
-                      placeholder="Passport Number"
-                      className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-sm"
-                      value={p.passportNumber}
-                      onChange={(e) => {
-                        const n = [...passengers];
-                        n[idx].passportNumber = e.target.value;
-                        setPassengers(n);
-                      }}
-                    />
-                    <input 
-                      placeholder="Nationality"
-                      className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-sm"
-                      value={p.nationality}
-                      onChange={(e) => {
-                        const n = [...passengers];
-                        n[idx].nationality = e.target.value;
-                        setPassengers(n);
-                      }}
-                    />
-                  </div>
-                  <input 
-                    type="date"
-                    className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-sm"
-                    value={p.dateOfBirth}
-                    onChange={(e) => {
-                      const n = [...passengers];
-                      n[idx].dateOfBirth = e.target.value;
-                      setPassengers(n);
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-8">
-            <h3 className="text-2xl font-serif text-white">Exclusive <span className="text-gold-400">Add-ons</span></h3>
-            <div className="space-y-4">
-              {EXTRAS.map(extra => (
-                <div 
-                  key={extra.id} 
-                  onClick={() => setSelectedExtras(prev => prev.includes(extra.id) ? prev.filter(x => x !== extra.id) : [...prev, extra.id])}
-                  className={`glass-card p-4 rounded-lg flex justify-between items-center cursor-pointer border transition-all ${selectedExtras.includes(extra.id) ? 'border-gold-400 bg-gold-400/5' : 'border-white/5'}`}
-                >
-                  <div>
-                    <p className="font-semibold text-white">{extra.name}</p>
-                    <p className="text-xs text-white/40">{extra.description}</p>
-                  </div>
-                  <div className="text-gold-400 font-bold">+${extra.price}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="glass-card p-6 rounded-lg bg-gold-400/5 border-gold-400/30">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-white/60">Flight Total</span>
-                <span className="text-xl font-bold">${calculateTotal()}</span>
-              </div>
-              <button 
-                onClick={() => setStep(4)}
-                className="w-full py-4 btn-gold text-black font-bold uppercase tracking-widest text-sm rounded-sm"
-              >
-                Proceed to Checkout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Step 4: Checkout
-  if (step === 4) {
-    return (
-      <div className="max-w-2xl mx-auto space-y-10">
-        <button onClick={() => setStep(3)} className="text-white/50 hover:text-gold-400 transition-colors uppercase text-xs tracking-widest">
-          ← Back to Services
-        </button>
-
-        <div className="glass-card p-10 rounded-lg space-y-8">
-          <div className="text-center">
-            <h3 className="text-3xl font-serif text-gold-400 mb-2">Secure Checkout</h3>
-            <p className="text-white/40 text-xs uppercase tracking-widest">Encrypted Luxury Transaction</p>
-          </div>
-
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase text-white/50 tracking-widest ml-1">Cardholder Name</label>
-              <input className="w-full bg-white/5 border border-white/10 p-4 rounded-sm" placeholder="JAMES R. CARTER" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase text-white/50 tracking-widest ml-1">Card Number</label>
-              <input className="w-full bg-white/5 border border-white/10 p-4 rounded-sm" placeholder="•••• •••• •••• ••••" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase text-white/50 tracking-widest ml-1">Expiry Date</label>
-                <input className="w-full bg-white/5 border border-white/10 p-4 rounded-sm" placeholder="MM/YY" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase text-white/50 tracking-widest ml-1">CVV</label>
-                <input className="w-full bg-white/5 border border-white/10 p-4 rounded-sm" placeholder="•••" />
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-white/10 space-y-4">
-             <div className="flex justify-between text-white/60">
-               <span>Subtotal</span>
-               <span>${calculateTotal()}</span>
-             </div>
-             <div className="flex justify-between text-white/60">
-               <span>Taxes & Fees</span>
-               <span>$142.50</span>
-             </div>
-             <div className="flex justify-between items-center text-white pt-2 border-t border-white/5">
-               <span className="text-xl font-serif">Grand Total</span>
-               <span className="text-2xl font-bold text-gold-400">${calculateTotal() + 142.50}</span>
-             </div>
-          </div>
-
-          <button 
-            onClick={handleFinalBooking}
-            className="w-full py-5 btn-gold text-black font-bold uppercase tracking-widest text-sm rounded-sm"
-          >
-            Authorize Payment
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Step 5: Confirmation / E-Ticket
-  if (step === 5) {
-    return (
-      <div className="max-w-4xl mx-auto py-10 animate-in zoom-in duration-500">
-        <div className="glass-card p-12 rounded-lg text-center border-t-8 border-gold-400">
-          <div className="w-20 h-20 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
-            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <h2 className="text-4xl font-serif text-white mb-4">Reservation <span className="text-gold-400">Confirmed</span></h2>
-          <p className="text-white/60 mb-12">An electronic ticket has been sent to your registered email address.</p>
-
-          <div className="bg-white/5 border border-white/10 p-10 rounded-lg text-left relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 text-gold-400/20 font-serif text-7xl select-none uppercase">Ticket</div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-              <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Passenger</p>
-                <p className="font-semibold">{passengers[0].fullName}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Flight</p>
-                <p className="font-semibold">{selectedFlight?.flightNumber}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Class</p>
-                <p className="font-semibold text-gold-400">{travelClass}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Seat(s)</p>
-                <p className="font-semibold">{selectedSeats.join(', ')}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Departure</p>
-                <p className="text-xl font-serif">{selectedFlight?.departureCity}</p>
-                <p className="text-sm text-white/60">{selectedFlight?.departureDate} | 14:00</p>
-              </div>
-              <div className="flex-grow border-b-2 border-dashed border-white/20 mx-8 mb-4 relative">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gold-400">✈</div>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Destination</p>
-                <p className="text-xl font-serif">{selectedFlight?.destinationCity}</p>
-                <p className="text-sm text-white/60">Estimated Landing | 21:45</p>
-              </div>
-            </div>
-
-            <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
-              <div className="bg-white p-2 rounded-sm w-32 h-32 flex items-center justify-center">
-                <div className="w-28 h-28 bg-black"></div> {/* Mock QR */}
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-white/40 font-mono tracking-widest">AURA-AUTH-RES-98231</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 space-x-6">
-            <button 
-              onClick={onComplete}
-              className="px-10 py-4 btn-gold text-black font-bold uppercase tracking-widest text-xs rounded-sm"
-            >
-              Back to Home
-            </button>
-            <button className="px-10 py-4 border border-gold-400 text-gold-400 font-bold uppercase tracking-widest text-xs rounded-sm hover:bg-gold-400/10 transition-all">
-              Print E-Ticket
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+  return <div>Step {step} placeholder</div>;
 };

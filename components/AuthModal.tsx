@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
 import { StorageService } from '../services/storage';
+import { LuxuryButton } from './LuxuryButton';
 
 interface AuthModalProps {
   onSuccess: (user: User) => void;
@@ -49,17 +50,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12">
-      <div className="glass-card p-8 rounded-lg shadow-2xl">
-        <h2 className="text-3xl font-serif font-bold text-gold-400 mb-2 text-center">
-          {isLogin ? 'Welcome Back' : 'Join Aura Airways'}
+    <div className="max-w-md mx-auto">
+      <div className="glass-card p-8 rounded-2xl shadow-2xl border border-white/10">
+        <h2 className="text-3xl font-serif font-bold text-gold-400 mb-2 text-center uppercase tracking-widest">
+          {isLogin ? 'Welcome Back' : 'Ascend with Us'}
         </h2>
-        <p className="text-white/50 text-center mb-8 text-sm uppercase tracking-widest">
-          {isLogin ? 'Enter your credentials to proceed' : 'Create an account for exclusive travel perks'}
+        <p className="text-white/50 text-center mb-8 text-[10px] uppercase tracking-[0.2em]">
+          {isLogin ? 'Enter your credentials to proceed' : 'Join Prime Air for exclusive travel benefits'}
         </p>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-sm mb-6 text-sm">
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6 text-sm">
             {error}
           </div>
         )}
@@ -67,47 +68,44 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <div>
-              <label className="block text-xs uppercase tracking-widest text-white/70 mb-2">Full Name</label>
+              <label className="block text-[10px] uppercase tracking-widest text-white/70 mb-2">Full Name</label>
               <input 
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-white focus:outline-none focus:border-gold-400"
+                className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white focus:outline-none focus:border-gold-400 transition-all"
                 placeholder="John Doe"
               />
             </div>
           )}
           <div>
-            <label className="block text-xs uppercase tracking-widest text-white/70 mb-2">Email Address</label>
+            <label className="block text-[10px] uppercase tracking-widest text-white/70 mb-2">Email Address</label>
             <input 
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-white focus:outline-none focus:border-gold-400"
-              placeholder="aura@luxury.com"
+              className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white focus:outline-none focus:border-gold-400 transition-all"
+              placeholder="user@prime.com"
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-widest text-white/70 mb-2">Password</label>
+            <label className="block text-[10px] uppercase tracking-widest text-white/70 mb-2">Password</label>
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 p-3 rounded-sm text-white focus:outline-none focus:border-gold-400"
+              className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white focus:outline-none focus:border-gold-400 transition-all"
               placeholder="••••••••"
             />
           </div>
 
-          <button 
-            type="submit"
-            className="w-full py-4 btn-gold text-black font-bold uppercase tracking-widest text-sm rounded-sm"
-          >
+          <LuxuryButton type="submit" className="w-full">
             {isLogin ? 'Sign In' : 'Create Account'}
-          </button>
+          </LuxuryButton>
         </form>
 
         <div className="mt-8 text-center border-t border-white/10 pt-6">
-          <p className="text-sm text-white/40">
+          <p className="text-xs text-white/40 uppercase tracking-widest">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
             <button 
               onClick={() => setIsLogin(!isLogin)}

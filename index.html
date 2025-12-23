@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aura Airways | Luxury Travel</title>
+    <title>PRIME AIR | Luxury Travel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script>
@@ -17,7 +17,7 @@
                 100: '#f5edd4',
                 200: '#ead7a2',
                 300: '#dec275',
-                400: '#d4af37', // Brand Gold
+                400: '#d4af37',
                 500: '#bd962b',
                 600: '#a37923',
                 700: '#845c1f',
@@ -25,9 +25,9 @@
                 900: '#5e4020',
               },
               luxury: {
-                deep: '#0a0c10',
-                glass: 'rgba(255, 255, 255, 0.08)',
-                border: 'rgba(255, 255, 255, 0.15)',
+                deep: '#050608',
+                glass: 'rgba(255, 255, 255, 0.04)',
+                border: 'rgba(255, 255, 255, 0.1)',
               }
             },
             fontFamily: {
@@ -39,52 +39,208 @@
       }
     </script>
     <style>
+      :root {
+        --mouse-x: 0px;
+        --mouse-y: 0px;
+      }
       body {
-        background-color: #0a0c10;
+        background-color: #050608;
         color: white;
         margin: 0;
         overflow-x: hidden;
+        cursor: crosshair;
       }
+      
+      .animated-bg {
+        background: radial-gradient(circle at center, #0a0c10 0%, #050608 100%);
+        min-height: 100vh;
+        position: relative;
+      }
+
+      .animated-bg::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        opacity: 0.05;
+        pointer-events: none;
+      }
+
       .glass-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s ease;
       }
+
+      .glass-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(212, 175, 55, 0.12), transparent 40%);
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+      }
+
+      .glass-card:hover::after {
+        opacity: 1;
+      }
+
       .gold-gradient {
-        background: linear-gradient(45deg, #d4af37, #f5edd4, #d4af37);
+        background: linear-gradient(45deg, #d4af37, #f5edd4, #d4af37, #bd962b);
+        background-size: 300% 300%;
+        animation: gradient-shift 8s ease infinite;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
-      .btn-gold {
-        background: linear-gradient(45deg, #d4af37, #bd962b);
-        transition: all 0.3s ease;
+
+      @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
-      .btn-gold:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-      }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #0a0c10; }
-      ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 4px; }
       
-      .animated-bg {
-        background: radial-gradient(circle at 50% 50%, #1a1e26 0%, #0a0c10 100%);
-        min-height: 100vh;
+      .luxury-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: inline-block;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .luxury-button:active { transform: scale(0.92); }
+      .luxury-button-inner {
+        position: relative;
+        display: inline-block;
+        padding: 14px 28px;
+        border: 1px solid #d4af37;
+        text-transform: uppercase;
+        color: #d4af37;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        background-color: transparent;
+        transition: color 0.3s;
+      }
+      .luxury-button-inner::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        background: #d4af37;
+        transition: transform 0.4s cubic-bezier(0.8, 0, 0.2, 1);
+        transform: scaleX(0);
+        transform-origin: right;
+        z-index: -1;
+      }
+      .luxury-button:hover .luxury-button-inner { color: #000; }
+      .luxury-button:hover .luxury-button-inner::before { 
+        transform: scaleX(1); 
+        transform-origin: left;
+      }
+      .luxury-button-inner span { position: relative; z-index: 3; }
+
+      /* Exact zjssun Uiverse Style Glow Buttons */
+      .glow-button {
+        padding: 10px 20px;
+        text-transform: uppercase;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #ffffff80;
+        text-shadow: none;
+        background: transparent;
+        cursor: pointer;
+        box-shadow: none;
+        border: 1px solid #ffffff30;
+        transition: 0.5s ease;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 100px;
+      }
+
+      .glow-button:hover, .glow-button:focus {
+        color: #ffffff;
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff;
+        outline: none;
+      }
+
+      .glow-button-blue:hover, .glow-button-blue:focus {
+        background: #008cff;
+        border: 1px solid #008cff;
+        box-shadow: 0 0 5px #008cff, 0 0 20px #008cff, 0 0 50px #008cff, 0 0 100px #008cff;
+      }
+
+      .glow-button-red:hover, .glow-button-red:focus {
+        background: #ff4d4d;
+        border: 1px solid #ff4d4d;
+        box-shadow: 0 0 5px #ff4d4d, 0 0 20px #ff4d4d, 0 0 50px #ff4d4d, 0 0 100px #ff4d4d;
+      }
+
+      .custom-cursor {
+        width: 30px; height: 30px;
+        border: 1px solid rgba(212, 175, 55, 0.5);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.1s ease-out;
+        transform: translate(-50%, -50%);
+        mix-blend-mode: difference;
+      }
+
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: #050608; }
+      ::-webkit-scrollbar-thumb { background: #d4af37; }
+
+      .magnetic {
+        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      /* Ticket Specific Styling */
+      .ticket-grid {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        min-height: 220px;
+      }
+      @media (max-width: 768px) {
+        .ticket-grid { grid-template-columns: 1fr; }
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
-  }
-}
-</script>
-</head>
+    <script>
+      document.addEventListener('mousemove', e => {
+        document.querySelectorAll('.glass-card').forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+        
+        const cursor = document.querySelector('.custom-cursor');
+        if (cursor) {
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+        }
+      });
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+      }
+    }
+    </script>
+  </head>
   <body>
+    <div class="custom-cursor"></div>
     <div id="root"></div>
   </body>
 </html>

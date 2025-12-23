@@ -1,5 +1,5 @@
 
-import { User, Flight, Booking, Aircraft } from '../types';
+import { User, Flight, Booking, Aircraft, UserRole } from '../types';
 import { INITIAL_FLIGHTS, AIRCRAFTS } from '../constants';
 
 const KEYS = {
@@ -19,14 +19,23 @@ export const StorageService = {
       localStorage.setItem(KEYS.AIRCRAFTS, JSON.stringify(AIRCRAFTS));
     }
     if (!localStorage.getItem(KEYS.USERS)) {
-      // Default admin
-      localStorage.setItem(KEYS.USERS, JSON.stringify([{
-        id: 'admin1',
-        email: 'admin@aura.com',
-        password: 'admin',
-        name: 'Aura Admin',
-        role: 'admin'
-      }]));
+      // Default accounts for testing: Admin and Dom
+      localStorage.setItem(KEYS.USERS, JSON.stringify([
+        {
+          id: 'admin-001',
+          email: 'admin@prime.com',
+          password: 'admin',
+          name: 'Admin',
+          role: UserRole.ADMIN
+        },
+        {
+          id: 'user-001',
+          email: 'user@prime.com',
+          password: 'user',
+          name: 'Dom',
+          role: UserRole.USER
+        }
+      ]));
     }
     if (!localStorage.getItem(KEYS.BOOKINGS)) {
       localStorage.setItem(KEYS.BOOKINGS, JSON.stringify([]));
@@ -67,11 +76,8 @@ export const StorageService = {
 
   cancelBooking: (bookingId: string) => {
     const bookings = StorageService.getBookings();
-    const index = bookings.findIndex(b => b.id === bookingId);
-    if (index !== -1) {
-      bookings[index].status = 'Cancelled';
-      localStorage.setItem(KEYS.BOOKINGS, JSON.stringify(bookings));
-    }
+    const updatedBookings = bookings.filter(b => b.id !== bookingId);
+    localStorage.setItem(KEYS.BOOKINGS, JSON.stringify(updatedBookings));
   },
 
   getAircrafts: (): Aircraft[] => JSON.parse(localStorage.getItem(KEYS.AIRCRAFTS) || '[]')
