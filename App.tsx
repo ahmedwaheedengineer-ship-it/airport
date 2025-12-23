@@ -1,23 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layout } from './components/Layout';
+import { Layout, WolfLogo } from './components/Layout';
 import { BookingFlow } from './components/BookingFlow';
 import { AuthModal } from './components/AuthModal';
 import { Profile } from './components/Profile';
 import { AdminDashboard } from './components/AdminDashboard';
 import { User, UserRole } from './types';
 import { StorageService } from './services/storage';
-
-const WolfLogo: React.FC<{ className?: string }> = ({ className = "w-20 h-20" }) => (
-  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M50 5L75 25L95 70L50 95L5 70L25 25L50 5Z" fill="#000" stroke="#d4af37" strokeWidth="1" />
-    <path d="M50 15L70 30L85 65L50 85L15 65L30 30L50 15Z" fill="white" />
-    <path d="M15 65L35 50L50 65L65 50L85 65L50 85L15 65Z" fill="#000" />
-    <circle cx="50" cy="35" r="5" fill="#d4af37" opacity="0.3" />
-    <path d="M48 45L52 45L51 55L49 55Z" fill="#000" />
-    <path d="M60 40L65 35L70 40" stroke="#000" strokeWidth="0.5" />
-  </svg>
-);
 
 const App: React.FC = () => {
   const [view, setView] = useState<string>('home');
@@ -42,19 +31,21 @@ const App: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen animated-bg flex items-center justify-center px-4 overflow-hidden">
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <WolfLogo className="w-[120%] h-[120%] absolute -top-1/4 -left-1/4 rotate-12" />
+      <div className="min-h-screen animated-bg flex flex-col items-center justify-start pt-10 px-4 overflow-hidden">
+        {/* Large watermark background using the new logo silhouette */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
+          <WolfLogo className="w-[150%] h-[150%] rotate-[-15deg] translate-x-[-10%] translate-y-[10%]" />
         </div>
-        <div className="w-full max-w-md relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-block mb-8 p-6 glass-card rounded-full border-gold-400/20">
-              <WolfLogo className="w-24 h-24" />
+        
+        <div className="w-full max-w-md relative z-10 mb-10">
+          <div className="text-center mb-8">
+            <div className="inline-block mb-6 p-10 glass-card rounded-[2rem] border-gold-400/20 bg-black/40">
+              <WolfLogo className="w-32 h-32" />
             </div>
             <h1 className="text-5xl font-serif font-bold tracking-[0.4em] text-white uppercase">
               Prime <span className="text-gold-400">Air</span>
             </h1>
-            <p className="text-white/40 text-[9px] uppercase tracking-[0.8em] mt-6 italic">Sovereign Excellence</p>
+            <p className="text-white/40 text-[9px] uppercase tracking-[0.8em] mt-4 italic font-bold">Sovereign Excellence</p>
           </div>
           <AuthModal onSuccess={handleLogin} />
         </div>

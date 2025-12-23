@@ -10,21 +10,143 @@ interface LayoutProps {
   onNavigate: (view: string) => void;
 }
 
-const WolfLogo: React.FC<{ className?: string }> = ({ className = "w-10 h-10" }) => (
+/**
+ * Sovereign Aura Logo:
+ * A high-luxury, abstract animated crest.
+ * Features a "breathing" golden core, orbital light rings, and a floating aero-mark.
+ */
+export const WolfLogo: React.FC<{ className?: string }> = ({ className = "w-10 h-10" }) => (
   <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    {/* Wolf Head Outline */}
-    <path d="M50 5L78 28L94 72L50 95L6 72L22 28L50 5Z" fill="#000" stroke="#d4af37" strokeWidth="1.5" />
-    {/* Inner White Contrast */}
-    <path d="M50 12L74 32L88 68L50 88L12 68L26 32L50 12Z" fill="white" />
-    {/* Interior Landscape Silhouette */}
-    <path d="M12 68L35 52L50 68L65 52L88 68L50 88L12 68Z" fill="#000" />
-    <path d="M40 58L45 52L50 58L55 52L60 58" stroke="#000" strokeWidth="2" strokeLinejoin="round" /> {/* Peaks */}
-    {/* Figure Silhouette */}
-    <path d="M49 58C49 58 48 64 48 68C48 68 50 68 50 68C50 64 51 58 51 58" fill="#000" />
-    <circle cx="50" cy="56" r="1.5" fill="#000" />
-    {/* Flying Birds */}
-    <path d="M68 45L71 42L74 45" stroke="#000" strokeWidth="0.8" />
-    <path d="M78 38L80 36L82 38" stroke="#000" strokeWidth="0.8" />
+    <defs>
+      {/* Soft Gold Aura Gradient */}
+      <radialGradient id="auraGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#f5edd4" stopOpacity="0.6" />
+        <stop offset="60%" stopColor="#d4af37" stopOpacity="0.2" />
+        <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+      </radialGradient>
+
+      {/* Deep Gold Stroke Gradient */}
+      <linearGradient id="goldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#bd962b" />
+        <stop offset="50%" stopColor="#f5edd4" />
+        <stop offset="100%" stopColor="#845c1f" />
+      </linearGradient>
+
+      {/* Filter for subtle bloom */}
+      <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="2" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
+
+    {/* Primary Aura Pulse */}
+    <circle cx="50" cy="50" r="45" fill="url(#auraGlow)">
+      <animate 
+        attributeName="r" 
+        values="42;48;42" 
+        dur="4s" 
+        repeatCount="indefinite" 
+        calcMode="spline" 
+        keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" 
+      />
+      <animate 
+        attributeName="opacity" 
+        values="0.4;0.8;0.4" 
+        dur="4s" 
+        repeatCount="indefinite" 
+      />
+    </circle>
+
+    {/* Orbital Rings - Counter-rotating for complexity */}
+    <g filter="url(#glowFilter)">
+      {/* Fast Outer Shimmer Ring */}
+      <circle 
+        cx="50" cy="50" r="40" 
+        stroke="url(#goldStroke)" 
+        strokeWidth="0.5" 
+        strokeDasharray="2 15" 
+        opacity="0.5"
+      >
+        <animateTransform 
+          attributeName="transform" 
+          type="rotate" 
+          from="0 50 50" 
+          to="360 50 50" 
+          dur="10s" 
+          repeatCount="indefinite" 
+        />
+      </circle>
+
+      {/* Slow Inner Stable Ring */}
+      <circle 
+        cx="50" cy="50" r="36" 
+        stroke="url(#goldStroke)" 
+        strokeWidth="0.25" 
+        strokeDasharray="40 20" 
+        opacity="0.3"
+      >
+        <animateTransform 
+          attributeName="transform" 
+          type="rotate" 
+          from="360 50 50" 
+          to="0 50 50" 
+          dur="25s" 
+          repeatCount="indefinite" 
+        />
+      </circle>
+    </g>
+
+    {/* Central Aero Mark - The Sovereign Wing */}
+    <g transform="translate(50, 50)">
+      <path 
+        d="M-22 12 L0 -24 L22 12" 
+        stroke="url(#goldStroke)" 
+        strokeWidth="3.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      >
+        <animate 
+          attributeName="d" 
+          values="M-22 12 L0 -24 L22 12; M-24 10 L0 -26 L24 10; M-22 12 L0 -24 L22 12" 
+          dur="4s" 
+          repeatCount="indefinite"
+          calcMode="spline" 
+          keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+        />
+      </path>
+      
+      {/* Floating Accent */}
+      <path 
+        d="M-10 16 L0 6 L10 16" 
+        stroke="#f5edd4" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+        opacity="0.5"
+      >
+        <animate 
+          attributeName="opacity" 
+          values="0.2;0.7;0.2" 
+          dur="2s" 
+          repeatCount="indefinite" 
+        />
+      </path>
+
+      {/* The Core Spark */}
+      <circle cx="0" cy="-24" r="2" fill="#fff">
+        <animate 
+          attributeName="opacity" 
+          values="0.4;1;0.4" 
+          dur="1.5s" 
+          repeatCount="indefinite" 
+        />
+        <animate 
+          attributeName="r" 
+          values="1.5;2.5;1.5" 
+          dur="1.5s" 
+          repeatCount="indefinite" 
+        />
+      </circle>
+    </g>
   </svg>
 );
 
@@ -59,7 +181,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, onNavi
           <Magnetic className="flex items-center space-x-5 cursor-pointer" 
             onClick={() => onNavigate('home')}
           >
-            <div className="flex items-center justify-center p-1.5 border border-gold-400/30 rounded-xl bg-black/40">
+            <div className="flex items-center justify-center p-1.5 border border-gold-400/30 rounded-full bg-black/60 shadow-lg shadow-gold-400/20">
               <WolfLogo className="w-14 h-14" />
             </div>
             <div>
@@ -76,7 +198,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, onNavi
                 onClick={() => onNavigate('home')}
                 className="text-white/60 hover:text-white transition-all uppercase text-[10px] tracking-[0.4em] font-bold"
               >
-                The Fleet
+                Trips
               </button>
             </Magnetic>
             
