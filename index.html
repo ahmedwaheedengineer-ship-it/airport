@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Airways | Luxury Travel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              gold: {
+                50: '#fbf8ed',
+                100: '#f5edd4',
+                200: '#ead7a2',
+                300: '#dec275',
+                400: '#d4af37', // Brand Gold
+                500: '#bd962b',
+                600: '#a37923',
+                700: '#845c1f',
+                800: '#6e4c20',
+                900: '#5e4020',
+              },
+              luxury: {
+                deep: '#0a0c10',
+                glass: 'rgba(255, 255, 255, 0.08)',
+                border: 'rgba(255, 255, 255, 0.15)',
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #0a0c10;
+        color: white;
+        margin: 0;
+        overflow-x: hidden;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+      .gold-gradient {
+        background: linear-gradient(45deg, #d4af37, #f5edd4, #d4af37);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .btn-gold {
+        background: linear-gradient(45deg, #d4af37, #bd962b);
+        transition: all 0.3s ease;
+      }
+      .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #0a0c10; }
+      ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 4px; }
+      
+      .animated-bg {
+        background: radial-gradient(circle at 50% 50%, #1a1e26 0%, #0a0c10 100%);
+        min-height: 100vh;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
